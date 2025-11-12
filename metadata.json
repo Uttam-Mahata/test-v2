@@ -1,0 +1,7 @@
+{
+  "name": "Copy of AI Financial Voice Assistant",
+  "description": "A conversational AI assistant for secure banking operations, allowing users to check balances, transfer funds, and view transaction history using their voice.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
