@@ -16,7 +16,7 @@ export const typeOrmConfig = (configService: ConfigService): TypeOrmModuleOption
   // Add SSL configuration if enabled
   if (sslEnabled) {
     try {
-      const ca = readFileSync(join(__dirname, '../../ca-certificate.crt'), 'utf8');
+      const ca = readFileSync(join(__dirname, '../../ca.pem'), 'utf8');
       sslConfig = {
         rejectUnauthorized: true,
         ca: ca,
@@ -50,7 +50,7 @@ const sslEnabled = process.env.DB_SSL === 'true';
 let sslConfig: any = false;
 if (sslEnabled) {
   try {
-    const ca = readFileSync(join(__dirname, '../../ca-certificate.crt'), 'utf8');
+    const ca = readFileSync(join(__dirname, '../../ca.pem'), 'utf8');
     sslConfig = {
       rejectUnauthorized: true,
       ca: ca,
