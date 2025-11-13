@@ -33,8 +33,10 @@ import { appConfig } from './config/app.config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        ttl: config.get('RATE_LIMIT_TTL', 60),
-        limit: config.get('RATE_LIMIT_MAX', 100),
+        throttlers: [{
+          ttl: config.get('RATE_LIMIT_TTL', 60000),
+          limit: config.get('RATE_LIMIT_MAX', 100),
+        }],
       }),
     }),
 
