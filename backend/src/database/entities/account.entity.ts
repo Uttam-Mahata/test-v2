@@ -11,11 +11,13 @@ import {
 import { User } from './user.entity';
 import { Transaction } from './transaction.entity';
 
-export enum AccountType {
-  CHECKING = 'checking',
-  SAVINGS = 'savings',
-  CREDIT = 'credit',
-}
+export const AccountType = {
+  CHECKING: 'checking',
+  SAVINGS: 'savings',
+  CREDIT: 'credit',
+} as const;
+
+export type AccountType = typeof AccountType[keyof typeof AccountType];
 
 @Entity('accounts')
 export class Account {
@@ -30,8 +32,7 @@ export class Account {
   user: User;
 
   @Column({
-    type: 'enum',
-    enum: AccountType,
+    type: 'varchar',
   })
   type: AccountType;
 

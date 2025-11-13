@@ -9,19 +9,23 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-export enum LoanType {
-  PERSONAL = 'personal',
-  AUTO = 'auto',
-  MORTGAGE = 'mortgage',
-  BUSINESS = 'business',
-}
+export const LoanType = {
+  PERSONAL: 'personal',
+  AUTO: 'auto',
+  MORTGAGE: 'mortgage',
+  BUSINESS: 'business',
+} as const;
 
-export enum LoanStatus {
-  ACTIVE = 'active',
-  PAID_OFF = 'paid_off',
-  DEFAULTED = 'defaulted',
-  PENDING = 'pending',
-}
+export type LoanType = typeof LoanType[keyof typeof LoanType];
+
+export const LoanStatus = {
+  ACTIVE: 'active',
+  PAID_OFF: 'paid_off',
+  DEFAULTED: 'defaulted',
+  PENDING: 'pending',
+} as const;
+
+export type LoanStatus = typeof LoanStatus[keyof typeof LoanStatus];
 
 @Entity('loans')
 export class Loan {
@@ -36,8 +40,7 @@ export class Loan {
   user: User;
 
   @Column({
-    type: 'enum',
-    enum: LoanType,
+    type: 'varchar',
   })
   type: LoanType;
 
@@ -63,9 +66,8 @@ export class Loan {
   termMonths: number;
 
   @Column({
-    type: 'enum',
-    enum: LoanStatus,
-    default: LoanStatus.ACTIVE,
+    type: 'varchar',
+    default: 'active',
   })
   status: LoanStatus;
 

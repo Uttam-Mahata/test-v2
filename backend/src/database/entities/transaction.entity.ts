@@ -8,17 +8,21 @@ import {
 } from 'typeorm';
 import { Account } from './account.entity';
 
-export enum TransactionType {
-  DEBIT = 'debit',
-  CREDIT = 'credit',
-}
+export const TransactionType = {
+  DEBIT: 'debit',
+  CREDIT: 'credit',
+} as const;
 
-export enum TransactionStatus {
-  PENDING = 'pending',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  REVERSED = 'reversed',
-}
+export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
+
+export const TransactionStatus = {
+  PENDING: 'pending',
+  COMPLETED: 'completed',
+  FAILED: 'failed',
+  REVERSED: 'reversed',
+} as const;
+
+export type TransactionStatus = typeof TransactionStatus[keyof typeof TransactionStatus];
 
 @Entity('transactions')
 export class Transaction {
@@ -33,8 +37,7 @@ export class Transaction {
   account: Account;
 
   @Column({
-    type: 'enum',
-    enum: TransactionType,
+    type: 'varchar',
   })
   type: TransactionType;
 
@@ -48,9 +51,8 @@ export class Transaction {
   referenceNumber: string;
 
   @Column({
-    type: 'enum',
-    enum: TransactionStatus,
-    default: TransactionStatus.COMPLETED,
+    type: 'varchar',
+    default: 'completed',
   })
   status: TransactionStatus;
 
