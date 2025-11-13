@@ -19,7 +19,7 @@
 - `DB_HOST`: localhost
 - `DB_PORT`: 5432
 - `DB_DATABASE`: ai_financial_assistant
-- **`GEMINI_API_KEY`**: ✅ Configured (AIzaSyDg9Xd_CTWKuEIM32mpwf3mcZ-yOt7Esis)
+- **`GEMINI_API_KEY`**: ✅ Configured (your_gemini_api_key_here)
 - `JWT_SECRET`: ✅ Set (production-grade)
 - `JWT_REFRESH_SECRET`: ✅ Set (production-grade)
 - `CORS_ORIGIN`: http://localhost:5173,http://localhost:3001

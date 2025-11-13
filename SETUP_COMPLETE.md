@@ -38,7 +38,7 @@ psql -h localhost -U postgres -d ai_financial_assistant -c "SELECT 1;"
 
 **Gemini AI Configuration:**
 ```
-✓ API Key: AIzaSyDg9Xd_CTWKuEIM32mpwf3mcZ-yOt7Esis
+✓ API Key: your_gemini_api_key_here
 ✓ Service: Google GenAI initialized
 ✓ Function Calling: Ready
 ✓ WebSocket Gateway: Configured

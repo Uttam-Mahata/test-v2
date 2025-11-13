@@ -4,7 +4,7 @@
 
 ### Backend Configuration ✓
 - **NestJS Backend**: Fully configured
-- **Gemini API Key**: Set (`AIzaSyDg9Xd_CTWKuEIM32mpwf3mcZ-yOt7Esis`)
+- **Gemini API Key**: Set (`your_gemini_api_key_here`)
 - **Environment File**: `/backend/.env` created
 - **Dependencies**: Installed (952 packages)
 
