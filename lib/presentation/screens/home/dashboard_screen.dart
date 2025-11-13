@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/voice_assistant_fab.dart';
+import '../accounts/accounts_screen.dart';
+import '../transactions/transactions_screen.dart';
+import '../payments/transfer_screen.dart';
+import '../voice/voice_assistant_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -13,16 +20,31 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppConstants.appName),
+        title: Text(
+          AppConstants.appName,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // TODO: Implement notifications
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Logout'),
-                  content: const Text('Are you sure you want to logout?'),
+                  title: Text(
+                    'Logout',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
+                  content: Text(
+                    'Are you sure you want to logout?',
+                    style: GoogleFonts.inter(),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -34,6 +56,9 @@ class DashboardScreen extends ConsumerWidget {
                         Navigator.pop(context);
                       },
                       child: const Text('Logout'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
                     ),
                   ],
                 ),
@@ -42,6 +67,9 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
+      // Voice Assistant FAB
+      floatingActionButton: const VoiceAssistantFAB(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -50,17 +78,19 @@ class DashboardScreen extends ConsumerWidget {
             // Welcome Section
             Text(
               'Welcome back,',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[400],
-                  ),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.grey[400],
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               user?.name ?? 'User',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              style: GoogleFonts.inter(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
 
             const SizedBox(height: 32),
@@ -68,9 +98,10 @@ class DashboardScreen extends ConsumerWidget {
             // Quick Actions
             Text(
               'Quick Actions',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -82,9 +113,10 @@ class DashboardScreen extends ConsumerWidget {
                     title: 'Transfer',
                     color: Colors.blue,
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Transfer feature coming soon!'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TransferScreen(),
                         ),
                       );
                     },
@@ -93,13 +125,14 @@ class DashboardScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.payment,
-                    title: 'Pay Bills',
+                    icon: Icons.account_balance_wallet,
+                    title: 'Accounts',
                     color: Colors.green,
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Payment feature coming soon!'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountsScreen(),
                         ),
                       );
                     },
@@ -116,11 +149,12 @@ class DashboardScreen extends ConsumerWidget {
                   child: _QuickActionCard(
                     icon: Icons.mic,
                     title: 'Voice Assistant',
-                    color: Colors.purple,
+                    color: const Color(0xFF06b6d4),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Voice assistant coming soon!'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const VoiceAssistantScreen(),
                         ),
                       );
                     },
@@ -133,9 +167,10 @@ class DashboardScreen extends ConsumerWidget {
                     title: 'Transactions',
                     color: Colors.orange,
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Transactions feature coming soon!'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TransactionsScreen(),
                         ),
                       );
                     },
@@ -152,15 +187,17 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Your Accounts',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('View all accounts coming soon!'),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AccountsScreen(),
                       ),
                     );
                   },
@@ -171,7 +208,7 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // Demo Account Cards
+            // Demo Account Cards (from seeded data)
             _AccountCard(
               type: 'Checking',
               balance: 5210.55,
@@ -195,33 +232,64 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // Info Banner
+            // Voice Banking Info Banner
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF292524),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF44403c)),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF06b6d4).withOpacity(0.1),
+                    const Color(0xFF0891b2).withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF06b6d4).withOpacity(0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.blue[300],
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF06b6d4).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.mic,
+                      color: Color(0xFF06b6d4),
+                      size: 28,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      'Full implementation of all features (Transfers, Payments, Voice Assistant, etc.) is in progress.',
-                      style: TextStyle(
-                        color: Colors.grey[300],
-                        fontSize: 13,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Voice Banking Assistant',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF06b6d4),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Try "Check my balance" or "Transfer money"',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(height: 100), // Space for FAB
           ],
         ),
       ),
@@ -245,6 +313,10 @@ class _QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -263,9 +335,10 @@ class _QuickActionCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -291,7 +364,13 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -310,34 +389,43 @@ class _AccountCard extends StatelessWidget {
               children: [
                 Text(
                   type,
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withOpacity(0.9),
                     fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Icon(
                   type.contains('Credit')
                       ? Icons.credit_card
                       : Icons.account_balance_wallet,
-                  color: Colors.white70,
+                  color: Colors.white.withOpacity(0.9),
                   size: 24,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             Text(
-              '\$${balance.abs().toStringAsFixed(2)}',
-              style: const TextStyle(
+              currencyFormat.format(balance.abs()),
+              style: GoogleFonts.inter(
                 color: Colors.white,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (balance < 0)
+              Text(
+                'Outstanding Balance',
+                style: GoogleFonts.inter(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 12,
+                ),
+              ),
             const SizedBox(height: 8),
             Text(
               accountNumber,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: GoogleFonts.inter(
+                color: Colors.white.withOpacity(0.8),
                 fontSize: 14,
                 letterSpacing: 2,
               ),
