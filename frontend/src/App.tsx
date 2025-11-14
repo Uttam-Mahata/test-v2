@@ -3,6 +3,7 @@ import { authService } from './services/auth.service';
 import { userService } from './services/user.service';
 import { User } from './types/types';
 import AssistantUI from './components/AssistantUI';
+import ConnectionTest from './components/ConnectionTest';
 import { LogoIcon } from './components/icons';
 
 const App: React.FC = () => {
@@ -12,6 +13,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [showTestMode, setShowTestMode] = useState<boolean>(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -71,6 +73,11 @@ const App: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  // Test mode for debugging connection issues
+  if (showTestMode) {
+    return <ConnectionTest />;
   }
 
   if (!user) {
@@ -146,6 +153,13 @@ const App: React.FC = () => {
               <strong>PIN:</strong> 1234 (for secure transactions)
             </p>
           </div>
+
+          <button
+            onClick={() => setShowTestMode(true)}
+            className="mt-4 w-full px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 text-sm rounded transition"
+          >
+            Connection Test Mode
+          </button>
         </div>
       </div>
     );
