@@ -1,6 +1,6 @@
 import { apiClient } from './api.client';
 import { API_ENDPOINTS } from '../config/api.config';
-import { User } from '../types/types';
+import { User, DataResponse, MessageResponse } from '../types/types';
 
 export interface UpdateProfileData {
   name?: string;
@@ -10,14 +10,24 @@ export interface UpdateProfileData {
 
 export const userService = {
   async getProfile(): Promise<User> {
-    return apiClient.get<User>(API_ENDPOINTS.USERS.PROFILE);
+    const response = await apiClient.get<DataResponse<User>>(
+      API_ENDPOINTS.USERS.PROFILE
+    );
+    return response.data;
   },
 
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    return apiClient.patch<User>(API_ENDPOINTS.USERS.PROFILE, data);
+    const response = await apiClient.patch<DataResponse<User>>(
+      API_ENDPOINTS.USERS.PROFILE,
+      data
+    );
+    return response.data;
   },
 
-  async deleteProfile(): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(API_ENDPOINTS.USERS.PROFILE);
+  async deleteProfile(): Promise<string> {
+    const response = await apiClient.delete<MessageResponse>(
+      API_ENDPOINTS.USERS.PROFILE
+    );
+    return response.message;
   },
 };

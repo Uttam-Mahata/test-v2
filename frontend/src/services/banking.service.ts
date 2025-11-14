@@ -1,108 +1,86 @@
 import { apiClient } from './api.client';
 import { API_ENDPOINTS } from '../config/api.config';
+import { Account, Transaction, Loan, DataResponse, MessageResponse } from '../types/types';
 
-export interface Account {
-  id: string;
-  userId: string;
-  accountNumber: string;
-  accountType: 'checking' | 'savings' | 'credit';
-  balance: number;
-  currency: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Transaction {
-  id: string;
-  accountId: string;
-  type: 'debit' | 'credit';
-  amount: number;
-  description: string;
-  category?: string;
-  recipientAccount?: string;
-  status: 'pending' | 'completed' | 'failed';
-  timestamp: string;
-  balance?: number;
-}
-
-export interface Loan {
-  id: string;
-  userId: string;
-  loanType: 'auto' | 'personal' | 'mortgage' | 'business';
-  principal: number;
-  interestRate: number;
-  termMonths: number;
-  remainingBalance: number;
-  monthlyPayment: number;
-  nextPaymentDate: string;
-  status: 'active' | 'paid-off' | 'defaulted';
-  createdAt: string;
+export interface CreateAccountData {
+  type: 'checking' | 'savings' | 'credit';
+  initialBalance?: number;
 }
 
 export interface TransferData {
   fromAccountType: 'checking' | 'savings' | 'credit';
   toAccountType: 'checking' | 'savings' | 'credit';
   amount: number;
-  description?: string;
   pin: string;
+  description?: string;
 }
 
 export interface ExternalPaymentData {
-  fromAccountId: string;
-  recipientAccount: string;
-  recipientName: string;
-  amount: number;
-  description: string;
-  pin: string;
-}
-
-export interface CreateAccountData {
   accountType: 'checking' | 'savings' | 'credit';
-  initialDeposit?: number;
+  amount: number;
+  recipient: string;
+  pin: string;
+  description?: string;
 }
 
 export const bankingService = {
   // Account operations
   async getAccounts(): Promise<Account[]> {
-    return apiClient.get<Account[]>(API_ENDPOINTS.ACCOUNTS.BASE);
+    const response = await apiClient.get<DataResponse<Account[]>>(
+      API_ENDPOINTS.ACCOUNTS.BASE
+    );
+    return response.data;
   },
 
   async getAccountById(id: string): Promise<Account> {
-    return apiClient.get<Account>(`${API_ENDPOINTS.ACCOUNTS.BASE}/${id}`);
+    const response = await apiClient.get<DataResponse<Account>>(
+      `${API_ENDPOINTS.ACCOUNTS.BASE}/${id}`
+    );
+    return response.data;
   },
 
-  async getAccountBalance(id: string): Promise<{ balance: number; currency: string }> {
-    return apiClient.get<{ balance: number; currency: string }>(
+  async getAccountBalance(id: string): Promise<{ balance: number }> {
+    const response = await apiClient.get<DataResponse<{ balance: number }>>(
       API_ENDPOINTS.ACCOUNTS.BALANCE(id)
     );
+    return response.data;
   },
 
   async createAccount(data: CreateAccountData): Promise<Account> {
-    return apiClient.post<Account>(API_ENDPOINTS.ACCOUNTS.BASE, data);
+    const response = await apiClient.post<DataResponse<Account>>(
+      API_ENDPOINTS.ACCOUNTS.BASE,
+      data
+    );
+    return response.data;
   },
 
-  async deleteAccount(id: string): Promise<{ message: string }> {
-    return apiClient.delete<{ message: string }>(
+  async deleteAccount(id: string): Promise<string> {
+    const response = await apiClient.delete<MessageResponse>(
       `${API_ENDPOINTS.ACCOUNTS.BASE}/${id}`
     );
+    return response.message;
   },
 
   // Transaction operations
   async getTransactions(): Promise<Transaction[]> {
-    return apiClient.get<Transaction[]>(API_ENDPOINTS.TRANSACTIONS.BASE);
+    const response = await apiClient.get<DataResponse<Transaction[]>>(
+      API_ENDPOINTS.TRANSACTIONS.BASE
+    );
+    return response.data;
   },
 
   async getTransactionsByAccount(accountId: string): Promise<Transaction[]> {
-    return apiClient.get<Transaction[]>(
+    const response = await apiClient.get<DataResponse<Transaction[]>>(
       API_ENDPOINTS.TRANSACTIONS.BY_ACCOUNT(accountId)
     );
+    return response.data;
   },
 
   async getTransactionById(id: string): Promise<Transaction> {
-    return apiClient.get<Transaction>(
+    const response = await apiClient.get<DataResponse<Transaction>>(
       `${API_ENDPOINTS.TRANSACTIONS.BASE}/${id}`
     );
+    return response.data;
   },
 
   // Payment operations
@@ -110,6 +88,7 @@ export const bankingService = {
     success: boolean;
     message: string;
     transaction?: Transaction;
+    confirmationNumber?: string;
   }> {
     return apiClient.post(API_ENDPOINTS.PAYMENTS.TRANSFER, data);
   },
@@ -118,26 +97,39 @@ export const bankingService = {
     success: boolean;
     message: string;
     transaction?: Transaction;
+    confirmationNumber?: string;
   }> {
     return apiClient.post(API_ENDPOINTS.PAYMENTS.EXTERNAL, data);
   },
 
   // Loan operations
   async getLoans(): Promise<Loan[]> {
-    return apiClient.get<Loan[]>(API_ENDPOINTS.LOANS.BASE);
+    const response = await apiClient.get<DataResponse<Loan[]>>(
+      API_ENDPOINTS.LOANS.BASE
+    );
+    return response.data;
   },
 
   async getActiveLoans(): Promise<Loan[]> {
-    return apiClient.get<Loan[]>(API_ENDPOINTS.LOANS.ACTIVE);
+    const response = await apiClient.get<DataResponse<Loan[]>>(
+      API_ENDPOINTS.LOANS.ACTIVE
+    );
+    return response.data;
   },
 
   async getLoanById(id: string): Promise<Loan> {
-    return apiClient.get<Loan>(`${API_ENDPOINTS.LOANS.BASE}/${id}`);
+    const response = await apiClient.get<DataResponse<Loan>>(
+      `${API_ENDPOINTS.LOANS.BASE}/${id}`
+    );
+    return response.data;
   },
 
   async getInterestRates(): Promise<{
     [key: string]: { rate: number; description: string };
   }> {
-    return apiClient.get(API_ENDPOINTS.LOANS.INTEREST_RATES);
+    const response = await apiClient.get<DataResponse<{
+      [key: string]: { rate: number; description: string };
+    }>>(API_ENDPOINTS.LOANS.INTEREST_RATES);
+    return response.data;
   },
 };

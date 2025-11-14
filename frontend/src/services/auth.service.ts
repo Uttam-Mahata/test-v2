@@ -1,11 +1,13 @@
 import { apiClient } from './api.client';
 import { API_ENDPOINTS } from '../config/api.config';
+import { AuthResponse, RegisterResponse } from '../types/types';
 
 export interface RegisterData {
   email: string;
   password: string;
   name: string;
-  phoneNumber: string;
+  phoneNumber?: string;
+  pin?: string;
 }
 
 export interface LoginData {
@@ -13,15 +15,14 @@ export interface LoginData {
   password: string;
 }
 
-export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    phoneNumber: string;
-  };
+export interface OTPGenerateResponse {
+  otp: string;
+  message: string;
+}
+
+export interface VerifyResponse {
+  verified: boolean;
+  message: string;
 }
 
 export interface OTPVerifyData {
@@ -33,24 +34,16 @@ export interface PINVerifyData {
 }
 
 export interface VoiceBiometricData {
-  audioData: Blob;
+  voiceData: string; // base64 encoded audio
 }
 
 export const authService = {
-  async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>(
-      API_ENDPOINTS.AUTH.REGISTER,
-      data
-    );
-    apiClient.setTokens(response.accessToken, response.refreshToken);
-    return response;
+  async register(data: RegisterData): Promise<RegisterResponse> {
+    return apiClient.post<RegisterResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
   },
 
   async login(data: LoginData): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>(
-      API_ENDPOINTS.AUTH.LOGIN,
-      data
-    );
+    const response = await apiClient.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data);
     apiClient.setTokens(response.accessToken, response.refreshToken);
     return response;
   },
@@ -59,38 +52,30 @@ export const authService = {
     apiClient.clearTokens();
   },
 
-  async generateOTP(): Promise<{ message: string }> {
-    return apiClient.get(API_ENDPOINTS.AUTH.OTP_GENERATE);
+  async generateOTP(): Promise<OTPGenerateResponse> {
+    return apiClient.get<OTPGenerateResponse>(API_ENDPOINTS.AUTH.OTP_GENERATE);
   },
 
-  async verifyOTP(data: OTPVerifyData): Promise<{ success: boolean; message: string }> {
-    return apiClient.post(API_ENDPOINTS.AUTH.OTP_VERIFY, data);
+  async verifyOTP(data: OTPVerifyData): Promise<VerifyResponse> {
+    return apiClient.post<VerifyResponse>(API_ENDPOINTS.AUTH.OTP_VERIFY, data);
   },
 
-  async verifyPIN(data: PINVerifyData): Promise<{ success: boolean; message: string }> {
-    return apiClient.post(API_ENDPOINTS.AUTH.PIN_VERIFY, data);
+  async verifyPIN(data: PINVerifyData): Promise<VerifyResponse> {
+    return apiClient.post<VerifyResponse>(API_ENDPOINTS.AUTH.PIN_VERIFY, data);
   },
 
-  async enrollVoiceBiometric(audioData: Blob): Promise<{ success: boolean; message: string }> {
-    const formData = new FormData();
-    formData.append('audio', audioData, 'voice-sample.wav');
-
-    return apiClient.post(API_ENDPOINTS.AUTH.VOICE_ENROLL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  async enrollVoiceBiometric(voiceData: string): Promise<{ message: string }> {
+    return apiClient.post<{ message: string }>(
+      API_ENDPOINTS.AUTH.VOICE_ENROLL,
+      { voiceData }
+    );
   },
 
-  async verifyVoiceBiometric(audioData: Blob): Promise<{ success: boolean; message: string; confidence?: number }> {
-    const formData = new FormData();
-    formData.append('audio', audioData, 'voice-verification.wav');
-
-    return apiClient.post(API_ENDPOINTS.AUTH.VOICE_VERIFY, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  async verifyVoiceBiometric(voiceData: string): Promise<VerifyResponse> {
+    return apiClient.post<VerifyResponse>(
+      API_ENDPOINTS.AUTH.VOICE_VERIFY,
+      { voiceData }
+    );
   },
 
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
