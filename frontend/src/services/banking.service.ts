@@ -41,10 +41,10 @@ export interface Loan {
 }
 
 export interface TransferData {
-  fromAccountId: string;
-  toAccountId: string;
+  fromAccountType: 'checking' | 'savings' | 'credit';
+  toAccountType: 'checking' | 'savings' | 'credit';
   amount: number;
-  description: string;
+  description?: string;
   pin: string;
 }
 

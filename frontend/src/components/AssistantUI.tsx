@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenAI, LiveSession, LiveServerMessage, Modality } from '@google/genai';
 import { User, Account, AssistantStatus, ChatMessage, PendingToolCall, Transaction, FinancialInfo } from '../types/types';
-import { bankingApi } from '../services/mockBankingApi';
+import { bankingApi } from '../services/bankingApiAdapter';
 import {
   SYSTEM_INSTRUCTION,
   getAccountBalanceDeclaration,
@@ -138,7 +138,7 @@ const AssistantUI: React.FC<{ user: User; onLogout: () => void }> = ({ user, onL
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
         outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
 
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
         
         // FIX: Use a local sessionPromise constant to avoid stale closures in callbacks.
         const sessionPromise = ai.live.connect({

@@ -1,16 +1,6 @@
 import { apiClient } from './api.client';
 import { API_ENDPOINTS } from '../config/api.config';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  phoneNumber: string;
-  isActive: boolean;
-  isVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from '../types/types';
 
 export interface UpdateProfileData {
   name?: string;

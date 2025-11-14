@@ -1,8 +1,13 @@
 
 export interface User {
   id: string;
+  email: string;
   name: string;
-  pin: string;
+  phoneNumber: string;
+  isActive?: boolean;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Account {

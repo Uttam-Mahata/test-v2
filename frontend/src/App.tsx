@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from './services/auth.service';
-import { userService, User } from './services/user.service';
+import { userService } from './services/user.service';
+import { User } from './types/types';
 import AssistantUI from './components/AssistantUI';
 import { LogoIcon } from './components/icons';
 
