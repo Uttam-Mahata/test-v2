@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenAI, LiveSession, LiveServerMessage, Modality } from '@google/genai';
-import { User, Account, AssistantStatus, ChatMessage, PendingToolCall, Transaction, FinancialInfo } from '../types';
+import { User, Account, AssistantStatus, ChatMessage, PendingToolCall, Transaction, FinancialInfo } from '../types/types';
 import { bankingApi } from '../services/mockBankingApi';
 import {
   SYSTEM_INSTRUCTION,
@@ -9,7 +9,7 @@ import {
   getFinancialProductsInfoDeclaration,
   getTransactionHistoryDeclaration,
   transferFundsDeclaration,
-} from '../constants';
+} from '../config/constants';
 import { LogoIcon, MicIcon, PowerIcon, UserIcon, BackspaceIcon, ArrowDownCircleIcon, ArrowUpCircleIcon, BanknotesIcon, CreditCardIcon, ReceiptPercentIcon } from './icons';
 
 // Audio Encoding/Decoding functions

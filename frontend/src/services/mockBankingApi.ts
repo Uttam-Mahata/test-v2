@@ -1,5 +1,5 @@
 
-import { User, Account, Transaction, Loan } from '../types';
+import { User, Account, Transaction, Loan } from '../types/types';
 
 // FIX: Explicitly type MOCK_DATA to ensure properties match their respective interfaces.
 const MOCK_DATA: {
