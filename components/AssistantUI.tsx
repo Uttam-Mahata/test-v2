@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { GoogleGenAI, LiveSession, LiveServerMessage, Modality } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { User, Account, AssistantStatus, ChatMessage, PendingToolCall, Transaction, FinancialInfo } from '../types';
 import { bankingApi } from '../services/mockBankingApi';
 import {
@@ -76,7 +76,7 @@ const AssistantUI: React.FC<{ user: User; onLogout: () => void }> = ({ user, onL
   const [pendingTransactions, setPendingTransactions] = useState<Transaction[] | null>(null);
   const [pendingFinancialInfo, setPendingFinancialInfo] = useState<FinancialInfo | null>(null);
 
-  const sessionPromiseRef = useRef<Promise<LiveSession> | null>(null);
+  const sessionPromiseRef = useRef<Promise<any> | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
@@ -245,21 +245,23 @@ const AssistantUI: React.FC<{ user: User; onLogout: () => void }> = ({ user, onL
         for (const fc of message.toolCall.functionCalls) {
             let result;
             if (fc.name === 'getAccountBalance') {
-                const account = accounts.find(a => a.type === fc.args.accountType);
-                result = account ? { balance: account.balance, currency: account.currency } : { error: `Account ${fc.args.accountType} not found.` };
+                const balanceResponse = await bankingApi.getAccountBalance(user.id, fc.args.accountType as string);
+                result = balanceResponse;
             } else if (fc.name === 'getTransactionHistory') {
-                const transactions = await bankingApi.getTransactions(user.id, fc.args.accountType);
+                const transactions = await bankingApi.getTransactionHistory(user.id, fc.args.accountType as string);
                 if (Array.isArray(transactions)) {
                     setPendingTransactions(transactions);
                 }
                 result = transactions;
             } else if (fc.name === 'getFinancialProductsInfo') {
-                const info = await bankingApi.getFinancialProductsInfo(user.id, fc.args.productType);
-                const financialInfo: FinancialInfo = {};
-                if (fc.args.productType === 'loans') financialInfo.loans = info;
-                else if (fc.args.productType === 'credit_limit') financialInfo.creditAccounts = info;
-                else if (fc.args.productType === 'interest_rates') financialInfo.interestRates = info;
-                setPendingFinancialInfo(financialInfo);
+                const info = await bankingApi.getFinancialProductsInfo(user.id, fc.args.productType as 'loans' | 'credit_limit' | 'interest_rates');
+                if (!('error' in info)) {
+                    const financialInfo: FinancialInfo = {};
+                    if (fc.args.productType === 'loans') financialInfo.loans = info as any;
+                    else if (fc.args.productType === 'credit_limit') financialInfo.creditAccounts = info as any;
+                    else if (fc.args.productType === 'interest_rates') financialInfo.interestRates = info as any;
+                    setPendingFinancialInfo(financialInfo);
+                }
                 result = info;
             } else if (fc.name === 'transferFunds') {
                 setPendingTransfer({ id: fc.id, name: fc.name, args: fc.args });

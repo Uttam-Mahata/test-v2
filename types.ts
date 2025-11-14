@@ -61,3 +61,22 @@ export interface PendingToolCall {
     name: string;
     args: any;
 }
+
+// API Response Types
+export interface AccountBalanceResponse {
+  balance: number;
+  currency: 'USD';
+  accountType: string;
+}
+
+export interface TransferResponse {
+  success: boolean;
+  message: string;
+  confirmationNumber?: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
+
+export type FinancialProductsResponse = Loan[] | Account[] | { [key: string]: string };

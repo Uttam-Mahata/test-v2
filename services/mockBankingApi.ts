@@ -1,5 +1,5 @@
 
-import { User, Account, Transaction, Loan } from '../types';
+import { User, Account, Transaction, Loan, AccountBalanceResponse, TransferResponse, FinancialProductsResponse, ErrorResponse } from '../types';
 
 // FIX: Explicitly type MOCK_DATA to ensure properties match their respective interfaces.
 const MOCK_DATA: {
@@ -50,7 +50,20 @@ export const bankingApi = {
     return MOCK_DATA.accounts.filter(acc => acc.userId === userId);
   },
 
-  getTransactions: async (userId: string, accountType: string): Promise<Transaction[] | { error: string }> => {
+  getAccountBalance: async (userId: string, accountType: string): Promise<AccountBalanceResponse | ErrorResponse> => {
+    await delay(500);
+    const account = MOCK_DATA.accounts.find(acc => acc.userId === userId && acc.type === accountType);
+    if (!account) {
+      return { error: `Account type '${accountType}' not found.` };
+    }
+    return {
+      balance: account.balance,
+      currency: account.currency,
+      accountType: account.type
+    };
+  },
+
+  getTransactionHistory: async (userId: string, accountType: string): Promise<Transaction[] | ErrorResponse> => {
     await delay(700);
     const account = MOCK_DATA.accounts.find(acc => acc.userId === userId && acc.type === accountType);
     if (!account) {
@@ -59,7 +72,7 @@ export const bankingApi = {
     return MOCK_DATA.transactions.filter(txn => txn.accountId === account.id);
   },
 
-  getFinancialProductsInfo: async (userId: string, productType: 'loans' | 'credit_limit' | 'interest_rates'): Promise<any> => {
+  getFinancialProductsInfo: async (userId: string, productType: 'loans' | 'credit_limit' | 'interest_rates'): Promise<FinancialProductsResponse | ErrorResponse> => {
     await delay(600);
     switch (productType) {
         case 'loans':
@@ -74,12 +87,12 @@ export const bankingApi = {
   },
 
   transferFunds: async (
-    userId: string, 
-    fromAccountType: string, 
-    toAccountType: string, 
-    amount: number, 
+    userId: string,
+    fromAccountType: string,
+    toAccountType: string,
+    amount: number,
     pin: string
-  ): Promise<{ success: boolean; message: string; confirmationNumber?: string }> => {
+  ): Promise<TransferResponse> => {
     await delay(1500);
     const user = MOCK_DATA.users.find(u => u.id === userId);
     if (!user || user.pin !== pin) {
