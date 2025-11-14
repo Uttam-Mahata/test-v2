@@ -41,12 +41,17 @@ const App: React.FC = () => {
     setError('');
 
     try {
+      console.log('Attempting login with:', { email });
       const response = await authService.login({ email, password });
+      console.log('Login response:', response);
+      console.log('User from response:', response.user);
       setUser(response.user);
+      console.log('User state set successfully');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      console.error('Login error details:', err);
+      console.error('Error response:', err.response);
+      const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
       setError(errorMessage);
-      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }

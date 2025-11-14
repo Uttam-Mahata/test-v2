@@ -3,12 +3,12 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  phoneNumber: string;
+  phoneNumber?: string;
   isActive: boolean;
   isVerified: boolean;
-  lastLogin?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  lastLogin?: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 // Account types - matches backend Account entity
