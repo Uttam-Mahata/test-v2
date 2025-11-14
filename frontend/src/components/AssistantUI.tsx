@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { GoogleGenAI, LiveSession, LiveServerMessage, Modality } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { User, Account, AssistantStatus, ChatMessage, PendingToolCall, Transaction, FinancialInfo } from '../types/types';
 import { bankingApi } from '../services/bankingApiAdapter';
 import {
@@ -248,13 +248,13 @@ const AssistantUI: React.FC<{ user: User; onLogout: () => void }> = ({ user, onL
                 const account = accounts.find(a => a.type === fc.args.accountType);
                 result = account ? { balance: account.balance, currency: account.currency } : { error: `Account ${fc.args.accountType} not found.` };
             } else if (fc.name === 'getTransactionHistory') {
-                const transactions = await bankingApi.getTransactions(user.id, fc.args.accountType);
+                const transactions = await bankingApi.getTransactions(user.id, (fc.args as any).accountType as string);
                 if (Array.isArray(transactions)) {
                     setPendingTransactions(transactions);
                 }
                 result = transactions;
             } else if (fc.name === 'getFinancialProductsInfo') {
-                const info = await bankingApi.getFinancialProductsInfo(user.id, fc.args.productType);
+                const info = await bankingApi.getFinancialProductsInfo(user.id, (fc.args as any).productType as 'loans' | 'credit_limit' | 'interest_rates');
                 const financialInfo: FinancialInfo = {};
                 if (fc.args.productType === 'loans') financialInfo.loans = info;
                 else if (fc.args.productType === 'credit_limit') financialInfo.creditAccounts = info;
@@ -408,7 +408,7 @@ const AssistantUI: React.FC<{ user: User; onLogout: () => void }> = ({ user, onL
                                 {tx.type === 'credit' ? <ArrowUpCircleIcon className="w-5 h-5 text-green-400 flex-shrink-0" /> : <ArrowDownCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0" />}
                                 <div>
                                     <p className="font-medium text-stone-200">{tx.description}</p>
-                                    <p className="text-xs text-stone-400">{new Date(tx.date).toLocaleDateString()}</p>
+                                    <p className="text-xs text-stone-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
                                 </div>
                             </div>
                             <p className={`font-mono font-medium ${tx.type === 'credit' ? 'text-green-400' : 'text-stone-200'}`}>

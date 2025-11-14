@@ -1,4 +1,4 @@
-import { bankingService, Account as BankingAccount, Transaction as BankingTransaction, Loan as BankingLoan } from './banking.service';
+import { bankingService } from './banking.service';
 import { User, Account, Transaction, Loan } from '../types/types';
 
 /**
@@ -6,14 +6,14 @@ import { User, Account, Transaction, Loan } from '../types/types';
  * the interface expected by AssistantUI (previously using mockBankingApi)
  */
 class BankingApiAdapter {
-  private accountsCache: BankingAccount[] = [];
+  private accountsCache: Account[] = [];
   private lastFetch: number = 0;
   private readonly CACHE_DURATION = 30000; // 30 seconds
 
   /**
    * Fetch and cache accounts to enable type-to-ID mapping
    */
-  private async getAccountsFromBackend(): Promise<BankingAccount[]> {
+  private async getAccountsFromBackend(): Promise<Account[]> {
     const now = Date.now();
     if (this.accountsCache.length > 0 && (now - this.lastFetch) < this.CACHE_DURATION) {
       return this.accountsCache;
@@ -30,55 +30,11 @@ class BankingApiAdapter {
   }
 
   /**
-   * Convert backend account format to UI account format
-   */
-  private mapAccount(backendAccount: BankingAccount): Account {
-    return {
-      id: backendAccount.id,
-      userId: backendAccount.userId,
-      type: backendAccount.accountType,
-      balance: backendAccount.balance,
-      currency: backendAccount.currency as 'USD',
-      limit: backendAccount.accountType === 'credit' ? 10000 : undefined, // You may need to get this from backend
-    };
-  }
-
-  /**
-   * Convert backend transaction format to UI transaction format
-   */
-  private mapTransaction(backendTx: BankingTransaction): Transaction {
-    return {
-      id: backendTx.id,
-      accountId: backendTx.accountId,
-      date: backendTx.timestamp,
-      description: backendTx.description,
-      amount: backendTx.amount,
-      type: backendTx.type,
-    };
-  }
-
-  /**
-   * Convert backend loan format to UI loan format
-   */
-  private mapLoan(backendLoan: BankingLoan): Loan {
-    return {
-      id: backendLoan.id,
-      userId: backendLoan.userId,
-      type: backendLoan.loanType,
-      principal: backendLoan.principal,
-      interestRate: backendLoan.interestRate,
-      remainingBalance: backendLoan.remainingBalance,
-      nextPaymentDate: backendLoan.nextPaymentDate,
-      nextPaymentAmount: backendLoan.monthlyPayment,
-    };
-  }
-
-  /**
    * Find account by type
    */
-  private async findAccountByType(accountType: string): Promise<BankingAccount | undefined> {
+  private async findAccountByType(accountType: string): Promise<Account | undefined> {
     const accounts = await this.getAccountsFromBackend();
-    return accounts.find(acc => acc.accountType === accountType);
+    return accounts.find(acc => acc.type === accountType);
   }
 
   /**
@@ -95,8 +51,7 @@ class BankingApiAdapter {
    */
   async getAccounts(userId: string): Promise<Account[]> {
     try {
-      const backendAccounts = await this.getAccountsFromBackend();
-      return backendAccounts.map(acc => this.mapAccount(acc));
+      return await this.getAccountsFromBackend();
     } catch (error) {
       console.error('Error fetching accounts:', error);
       return [];
@@ -113,8 +68,8 @@ class BankingApiAdapter {
         return { error: `Account type '${accountType}' not found.` };
       }
 
-      const backendTransactions = await bankingService.getTransactionsByAccount(account.id);
-      return backendTransactions.map(tx => this.mapTransaction(tx));
+      const transactions = await bankingService.getTransactionsByAccount(account.id);
+      return transactions;
     } catch (error) {
       console.error('Error fetching transactions:', error);
       return { error: 'Failed to fetch transactions' };
@@ -131,14 +86,14 @@ class BankingApiAdapter {
     try {
       switch (productType) {
         case 'loans': {
-          const backendLoans = await bankingService.getActiveLoans();
-          return backendLoans.map(loan => this.mapLoan(loan));
+          const loans = await bankingService.getActiveLoans();
+          return loans;
         }
 
         case 'credit_limit': {
           const accounts = await this.getAccountsFromBackend();
-          const creditAccounts = accounts.filter(a => a.accountType === 'credit');
-          return creditAccounts.map(acc => this.mapAccount(acc));
+          const creditAccounts = accounts.filter(a => a.type === 'credit');
+          return creditAccounts;
         }
 
         case 'interest_rates': {
@@ -173,19 +128,9 @@ class BankingApiAdapter {
     pin: string
   ): Promise<{ success: boolean; message: string; confirmationNumber?: string }> {
     try {
-      const fromAccount = await this.findAccountByType(fromAccountType);
-      const toAccount = await this.findAccountByType(toAccountType);
-
-      if (!fromAccount || !toAccount) {
-        return {
-          success: false,
-          message: 'One or both accounts not found.'
-        };
-      }
-
       const result = await bankingService.transferFunds({
-        fromAccountId: fromAccount.id,
-        toAccountId: toAccount.id,
+        fromAccountType: fromAccountType as 'checking' | 'savings' | 'credit',
+        toAccountType: toAccountType as 'checking' | 'savings' | 'credit',
         amount,
         description: `Transfer from ${fromAccountType} to ${toAccountType}`,
         pin,
@@ -200,7 +145,7 @@ class BankingApiAdapter {
       return {
         success: result.success,
         message: result.message,
-        confirmationNumber: result.transaction?.id,
+        confirmationNumber: result.transaction?.id || result.confirmationNumber,
       };
     } catch (error: any) {
       console.error('Error transferring funds:', error);
