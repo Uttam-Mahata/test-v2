@@ -1,7 +1,6 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
   WS_URL: import.meta.env.VITE_WS_URL || 'ws://localhost:3000',
-  GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY || '',
   TIMEOUT: 30000,
 };
 
