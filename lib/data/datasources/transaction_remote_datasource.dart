@@ -6,10 +6,8 @@ import '../models/transaction_model.dart';
 abstract class TransactionRemoteDataSource {
   Future<List<TransactionModel>> getTransactions({
     int? limit,
-    int? offset,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
+    // Note: Backend only supports 'limit' parameter
+    // offset, type, startDate, endDate are not supported by backend API
   });
   Future<TransactionModel> getTransactionById(String transactionId);
 }
@@ -22,22 +20,10 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
   @override
   Future<List<TransactionModel>> getTransactions({
     int? limit,
-    int? offset,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
       if (limit != null) queryParams['limit'] = limit;
-      if (offset != null) queryParams['offset'] = offset;
-      if (type != null) queryParams['type'] = type;
-      if (startDate != null) {
-        queryParams['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queryParams['endDate'] = endDate.toIso8601String();
-      }
 
       final response = await _dio.get(
         ApiEndpoints.transactions,

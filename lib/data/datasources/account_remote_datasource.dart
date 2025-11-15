@@ -62,7 +62,7 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
   Future<List<TransactionModel>> getAccountTransactions(String accountId) async {
     try {
       final response = await _dio.get(
-        '${ApiEndpoints.accounts}/$accountId/transactions',
+        ApiEndpoints.transactionsByAccount(accountId),
       );
 
       if (response.statusCode == 200) {

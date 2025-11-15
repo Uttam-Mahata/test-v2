@@ -26,6 +26,8 @@ class ApiEndpoints {
       '/transactions/account/$accountId';
   static String transactionById(String id) => '/transactions/$id';
 
+  // Note: Backend only supports 'limit' query parameter for transactions
+
   // Payments
   static const String transferFunds = '/payments/transfer';
   static const String externalPayment = '/payments/external';
